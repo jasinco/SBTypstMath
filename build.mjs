@@ -13,3 +13,6 @@ for (const font of ['NewCMMath-Regular.otf', 'NewCM10-Regular.otf', 'NewCM10-Ita
   if (!response.ok) throw new Error(`Cannot download ${font}: ${response.status}`);
   await writeFile(`${out}/${font}`, new Uint8Array(await response.arrayBuffer()));
 }
+const packageResponse = await fetch('https://packages.typst.org/preview/curryst-0.6.0.tar.gz');
+if (!packageResponse.ok) throw new Error(`Cannot download curryst: ${packageResponse.status}`);
+await writeFile(`${out}/curryst-0.6.0.tar.gz`, new Uint8Array(await packageResponse.arrayBuffer()));

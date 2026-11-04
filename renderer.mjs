@@ -1,4 +1,24 @@
 import { $typst, TypstSnippet } from '@myriaddreamin/typst.ts/dist/esm/contrib/snippet.mjs';
+import { MemoryAccessModel } from '@myriaddreamin/typst.ts/dist/esm/fs/index.mjs';
+
+const packageFiles = new MemoryAccessModel();
+let curryst;
+$typst.use(
+  TypstSnippet.withAccessModel(packageFiles),
+  TypstSnippet.fetchPackageBy(packageFiles, spec =>
+    spec.namespace === 'preview' && spec.name === 'curryst' && spec.version === '0.6.0' ? curryst : undefined),
+);
+
+let packageLoad;
+function loadPackages() {
+  return packageLoad ??= fetch(asset('curryst-0.6.0.tar.gz')).then(async response => {
+    if (!response.ok) throw new Error(`Cannot load curryst package: ${response.status}`);
+    curryst = new Uint8Array(await response.arrayBuffer());
+  }).catch(error => {
+    packageLoad = undefined;
+    throw error;
+  });
+}
 
 const asset = name => new URL(name, import.meta.url).href;
 $typst.setCompilerInitOptions({ getModule: () => asset('compiler.wasm') });
@@ -12,8 +32,9 @@ $typst.use(TypstSnippet.disableDefaultFontAssets(), TypstSnippet.preloadFonts([
 const escape = text => String(text).replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
 let queue = Promise.resolve();
 
-function renderSource(source, altText) {
+function renderSource(source, altText, needsPackages = false) {
   const job = queue.then(async () => {
+    if (needsPackages) await loadPackages();
     const svg = await $typst.svg({ mainContent: source });
     if (!svg) throw new Error('Typst could not compile this expression');
     const width = Number(svg.match(/<svg\b[^>]*\bwidth="([\d.]+)"/)?.[1]);
@@ -37,5 +58,5 @@ export function render(expression, display = false) {
 export function renderDocument(body) {
   if (!body.trim()) return Promise.resolve('');
   const source = `#set text(font: "New Computer Modern", size: 12pt)\n#set page(width: auto, height: auto, margin: 1em, fill: none)\n${body}`;
-  return renderSource(source, body).then(html => `<div class="typst-document">${html}</div>`);
+  return renderSource(source, body, true).then(html => `<div class="typst-document">${html}</div>`);
 }

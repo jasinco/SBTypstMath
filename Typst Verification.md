@@ -12,6 +12,21 @@ $$
 integral_(-infinity)^infinity e^(-x^2) dif x = sqrt(pi)
 $$
 
+## Proof tree
+
+The two premises should appear above the inference line and the conclusion below it.
+
+```typst
+#import "@preview/curryst:0.6.0": prooftree, rule
+#prooftree(
+  rule(
+    $forall x [P(x) or Q(x)]$,
+    $forall x [(not P(x) and Q(x)) -> R(x)]$,
+    $therefore forall x [not R(x) -> P(x)]$
+  ),
+)
+```
+
 ## Proof table
 
 The eleven-row table should render at its native size. On narrow screens, scroll horizontally to see the Reason column. The fence metadata `size=0.9` is ignored.

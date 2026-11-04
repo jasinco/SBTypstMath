@@ -10,6 +10,7 @@ files:
   - TypstMath/NewCM10-Italic.otf
   - TypstMath/NewCM10-Bold.otf
   - TypstMath/NewCM10-BoldItalic.otf
+  - TypstMath/curryst-0.6.0.tar.gz
 ---
 
 # Typst Math

@@ -7134,6 +7134,22 @@ var $typst = new TypstSnippet({
 });
 
 // renderer.mjs
+var packageFiles = new MemoryAccessModel();
+var curryst;
+$typst.use(
+  TypstSnippet.withAccessModel(packageFiles),
+  TypstSnippet.fetchPackageBy(packageFiles, (spec) => spec.namespace === "preview" && spec.name === "curryst" && spec.version === "0.6.0" ? curryst : void 0)
+);
+var packageLoad;
+function loadPackages() {
+  return packageLoad ??= fetch(asset("curryst-0.6.0.tar.gz")).then(async (response) => {
+    if (!response.ok) throw new Error(`Cannot load curryst package: ${response.status}`);
+    curryst = new Uint8Array(await response.arrayBuffer());
+  }).catch((error) => {
+    packageLoad = void 0;
+    throw error;
+  });
+}
 var asset = (name) => new URL(name, import.meta.url).href;
 $typst.setCompilerInitOptions({ getModule: () => asset("compiler.wasm") });
 $typst.setRendererInitOptions({ getModule: () => asset("renderer.wasm") });
@@ -7146,8 +7162,9 @@ $typst.use(TypstSnippet.disableDefaultFontAssets(), TypstSnippet.preloadFonts([
 ]));
 var escape = (text) => String(text).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var queue = Promise.resolve();
-function renderSource(source, altText) {
+function renderSource(source, altText, needsPackages = false) {
   const job = queue.then(async () => {
+    if (needsPackages) await loadPackages();
     const svg = await $typst.svg({ mainContent: source });
     if (!svg) throw new Error("Typst could not compile this expression");
     const width = Number(svg.match(/<svg\b[^>]*\bwidth="([\d.]+)"/)?.[1]);
@@ -7172,7 +7189,7 @@ function renderDocument(body) {
   const source = `#set text(font: "New Computer Modern", size: 12pt)
 #set page(width: auto, height: auto, margin: 1em, fill: none)
 ${body}`;
-  return renderSource(source, body).then((html) => `<div class="typst-document">${html}</div>`);
+  return renderSource(source, body, true).then((html) => `<div class="typst-document">${html}</div>`);
 }
 export {
   render,
