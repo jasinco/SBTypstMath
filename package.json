@@ -1,0 +1,12 @@
+{
+  "name": "silverbullet-typst-math",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "node build.mjs" },
+  "dependencies": {
+    "@myriaddreamin/typst.ts": "0.8.0-rc3",
+    "@myriaddreamin/typst-ts-web-compiler": "0.8.0-rc3",
+    "@myriaddreamin/typst-ts-renderer": "0.8.0-rc3"
+  },
+  "devDependencies": { "esbuild": "0.25.12" }
+}
