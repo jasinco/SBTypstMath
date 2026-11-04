@@ -69,6 +69,18 @@ These are Typst expressions and documents, not LaTeX. Compilation errors appear 
 
 Inline SVGs include vertical padding for superscripts, subscripts, and fractions that extend beyond Typst's paragraph line box.
 
+## Adding a Typst package dependency
+
+Imports in fenced blocks resolve only packages registered in the browser compiler. To bundle another `@preview/name:version` package:
+
+1. In `build.mjs`, download `https://packages.typst.org/preview/name-version.tar.gz` into `Library/TypstMath/name-version.tar.gz`, checking the response as for curryst. Pin the exact version.
+2. Add `TypstMath/name-version.tar.gz` to the `files` list in `Library/TypstMath.md` so SilverBullet indexes and serves it.
+3. In `renderer.mjs`, load the archive as a `Uint8Array` in `loadPackages()`, using `asset(...)` and checking the response. Extend the `TypstSnippet.fetchPackageBy` callback to return those bytes for the matching namespace, name, and version. Keep returning `undefined` for packages that are not bundled.
+4. Repeat these steps for any packages imported by the dependency itself. The registry does not download transitive dependencies automatically.
+5. Run `npm run build`, copy the updated library into the space, and reload SilverBullet as described above. Try a fenced block importing the exact package version, including a path that exercises its dependencies.
+
+The archives are loaded locally before document compilation; package imports do not grant access to files in the SilverBullet space.
+
 ## Local test server
 
 Use the [SilverBullet server binary](https://docs.silverbullet.md/Install/Server%20Binary) and run `silverbullet -p 3100 /path/to/space`, then open `http://localhost:3100`. The server defaults to loopback; use proper authentication and TLS before exposing a space.
