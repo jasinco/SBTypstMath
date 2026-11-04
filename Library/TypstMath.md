@@ -42,11 +42,24 @@ syntax.define {
   end,
   renderHtml = function(body) return html(body, true) end,
 }
+
+codeWidget.define {
+  language = "typst",
+  render = function(bodyText, pageName)
+    return widget.new {
+      display = "block",
+      html = typstMath.renderDocument(bodyText),
+      markdown = bodyText,
+    }
+  end,
+}
 ```
 
 ```space-style
 .typst-math-image { vertical-align: middle; max-width: 100%; height: auto; }
 .typst-math-error { color: var(--error-color, #c33); text-decoration: underline wavy; }
+.typst-document { max-width: 100%; overflow-x: auto; }
+.typst-document .typst-math-image { max-width: none; }
 @media (prefers-color-scheme: dark) {
   .typst-math-image { filter: invert(1); }
 }

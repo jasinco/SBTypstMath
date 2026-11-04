@@ -26,10 +26,23 @@ integral_(-infinity)^infinity e^(-x^2) dif x = sqrt(pi)
 $$
 ```
 
-These are Typst expressions, not LaTeX. Compilation errors appear as underlined source; hover for the diagnostic. Equations run in the browser with an isolated in-memory compiler world, not against the space's files. Typst expressions are executable and can consume substantial CPU or memory; do not open untrusted formulas. SVG is rendered as an image rather than inserted as active HTML.
+Use a `typst` fenced block for a full Typst document:
+
+````markdown
+```typst
+#set text(size: 18pt)
+Hello, *Typst*!
+```
+````
+
+The document defaults to 12pt New Computer Modern text and an automatically sized transparent page; Typst set rules in the block can override those defaults. Wide documents scroll horizontally. Fence metadata such as `size=0.9` is ignored by SilverBullet; use Typst rules for sizing instead.
+
+These are Typst expressions and documents, not LaTeX. Compilation errors appear as underlined source; hover for the diagnostic. Compilation runs in the browser with an isolated in-memory compiler world, not against the space's files. Typst input is executable and can consume substantial CPU or memory; do not open untrusted input. SVG is rendered as an image rather than inserted as active HTML.
 
 Inline SVGs include vertical padding for superscripts, subscripts, and fractions that extend beyond Typst's paragraph line box.
 
 ## Local test server
 
 Use the [SilverBullet server binary](https://docs.silverbullet.md/Install/Server%20Binary) and run `silverbullet -p 3100 /path/to/space`, then open `http://localhost:3100`. The server defaults to loopback; use proper authentication and TLS before exposing a space.
+
+To check the installed library, copy `Typst Verification.md` to the root of your space and open the **Typst Verification** page. It exercises inline and display math, the proof table, native sizing, and error recovery.

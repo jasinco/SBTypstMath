@@ -7146,24 +7146,35 @@ $typst.use(TypstSnippet.disableDefaultFontAssets(), TypstSnippet.preloadFonts([
 ]));
 var escape = (text) => String(text).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 var queue = Promise.resolve();
-function render(expression, display = false) {
+function renderSource(source, altText) {
   const job = queue.then(async () => {
-    const math = display ? `$ ${expression} $` : `$${expression}$`;
-    const margin = display ? "0pt" : "(x: 0pt, y: 1em)";
-    const source = `#set text(size: 12pt)
-#set page(width: auto, height: auto, margin: ${margin}, fill: none)
-${math}`;
     const svg = await $typst.svg({ mainContent: source });
     if (!svg) throw new Error("Typst could not compile this expression");
     const width = Number(svg.match(/<svg\b[^>]*\bwidth="([\d.]+)"/)?.[1]);
     if (!Number.isFinite(width) || width <= 0) throw new Error("Typst returned an invalid SVG");
     const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ""));
-    return `<img class="typst-math-image" style="width:${width / 12}em" src="${url}" alt="${escape(expression)}">`;
+    return `<img class="typst-math-image" style="width:${width / 12}em" src="${url}" alt="${escape(altText)}">`;
   });
   queue = job.catch(() => {
   });
-  return job.catch((error) => `<span class="typst-math-error" title="${escape(error.message || error)}">${escape(expression)}</span>`);
+  return job.catch((error) => `<span class="typst-math-error" title="${escape(error.message || error)}">${escape(altText)}</span>`);
+}
+function render(expression, display = false) {
+  const math = display ? `$ ${expression} $` : `$${expression}$`;
+  const margin = display ? "0pt" : "(x: 0pt, y: 1em)";
+  const source = `#set text(size: 12pt)
+#set page(width: auto, height: auto, margin: ${margin}, fill: none)
+${math}`;
+  return renderSource(source, expression);
+}
+function renderDocument(body) {
+  if (!body.trim()) return Promise.resolve("");
+  const source = `#set text(font: "New Computer Modern", size: 12pt)
+#set page(width: auto, height: auto, margin: 1em, fill: none)
+${body}`;
+  return renderSource(source, body).then((html) => `<div class="typst-document">${html}</div>`);
 }
 export {
-  render
+  render,
+  renderDocument
 };
