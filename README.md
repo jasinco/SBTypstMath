@@ -14,6 +14,8 @@ cp -r Library/TypstMath.md Library/TypstMath /path/to/space/Library/
 
 Create `/path/to/space/Library` first if it does not exist. Reload SilverBullet twice, or run **System: Reload**, after the space has indexed the new files. Remove other extensions that register `$`/`$$` syntax first. The build downloads the New Computer Modern fonts from the pinned Typst assets release; the resulting library includes its WASM and fonts and does not need a CDN at runtime.
 
+GitHub Actions builds and uploads an installable library archive on pushes and pull requests. Pushing a `v*` tag also publishes that archive as a GitHub release.
+
 ## Usage
 
 Inline: `$sum_(n=1)^infinity 1/n^2 = pi^2/6$`.
